@@ -7,15 +7,17 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
         body { background-color: #0b131f; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .auction-container { width: 100%; max-width: 420px; height: 95vh; background: #111e30; display: flex; flex-direction: column; justify-content: space-between; border: 4px solid #FF6200; border-radius: 15px; overflow: hidden; position: relative; }
+        .auction-container { width: 100%; max-width: 420px; height: 95vh; background: #111e30; display: flex; flex-direction: column; justify-content: space-between; border: 4px solid #FF6200; border-radius: 15px; box-shadow: 0px 10px 30px rgba(255, 98, 0, 0.3); overflow: hidden; position: relative; }
         .player-card { background: #090f17; margin: 15px; padding: 15px; border-radius: 10px; border-bottom: 4px solid #FF6200; text-align: center; }
-        .player-card h2 { color: #FF6200; font-size: 24px; text-transform: uppercase; }
+        .player-card h2 { color: #FF6200; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+        .player-card p { font-size: 16px; color: #a0aec0; margin-top: 5px; }
+        .player-card span { color: #fff; font-weight: bold; }
         .srh-table-zone { display: flex; flex-direction: column; align-items: center; width: 100%; padding: 10px; }
-        .speech-bubble { background: #ffffff; color: #000000; border-radius: 8px; padding: 10px 15px; width: 85%; text-align: center; font-weight: bold; margin-bottom: 12px; position: relative; }
+        .speech-bubble { background: #ffffff; color: #000000; border-radius: 8px; padding: 10px 15px; width: 85%; text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 12px; position: relative; box-shadow: 0px 5px 15px rgba(0,0,0,0.2); }
         .speech-bubble:after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #ffffff; }
         .kavya-box { width: 220px; height: 180px; border-radius: 10px; border: 3px solid #FF6200; background-color: #004ba0; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         .kavya-box img { width: 100%; height: 100%; object-fit: cover; }
-        .orange-table { background: #FF6200; color: white; width: 90%; text-align: center; padding: 12px; font-weight: bold; border-radius: 5px 5px 0 0; }
+        .orange-table { background: linear-gradient(90deg, #FF6200, #ff7c26); color: white; width: 90%; text-align: center; padding: 12px; font-weight: bold; font-size: 16px; border-radius: 5px 5px 0 0; letter-spacing: 1px; }
         .controls { background: #090f17; padding: 15px; display: flex; justify-content: space-around; gap: 10px; }
         .btn { flex: 1; padding: 15px; font-size: 15px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
         .bid-btn { background-color: #00b4d8; color: white; }
@@ -26,12 +28,13 @@
     <div class="auction-container">
         <div class="player-card">
             <h2 id="player-name">Travis Head</h2>
+            <p>Base Price: <span id="base-price">₹2.00 Cr</span></p>
             <p>Current Bid: <span id="current-bid">₹2.00 Cr</span></p>
         </div>
         <div class="srh-table-zone">
             <div class="speech-bubble" id="kavya-speech">"Welcome to IPL 2027 Auction! Let's build the best team."</div>
             <div class="kavya-box">
-                <!-- शुरू में आइकॉन दिखेगा -->
+                <!-- शुरुआत में यह डिफ़ॉल्ट आइकॉन दिखेगा -->
                 <img id="kavya-img" src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='220' height='180' viewBox='0 0 220 180'><rect width='220' height='180' fill='%23111e30'/><text x='90' y='105' font-size='45'>🧑‍💼</text></svg>" alt="Kavya">
             </div>
             <div class="orange-table">SUNRISERS HYDERABAD</div>
@@ -42,32 +45,56 @@
         </div>
     </div>
     <script>
-    const players = [{ name: "Travis Head", maxBid: 4.0 }, { name: "Pat Cummins", maxBid: 5.5 }];
+    const players = [
+        { name: "Travis Head", basePrice: 2.0, maxBid: 4.0 }, 
+        { name: "Pat Cummins", basePrice: 2.0, maxBid: 5.5 }
+    ];
     let currentIndex = 0; let currentBid = 2.0; let isKavyaOut = false;
     
-    // यह इंटरनेट पर अपलोड होने के बाद आपकी असली रियलिस्टिक फोटो का रास्ता है
+    // यह आपकी असली फोटो का नाम है जो अभी आप मुख्य पेज पर अपलोड करेंगे
     const kavyaSadImage = "kavya-sad.png"; 
 
+    function updateUI() {
+        const player = players[currentIndex];
+        document.getElementById("player-name").innerText = player.name;
+        document.getElementById("base-price").innerText = `₹${player.basePrice.toFixed(2)} Cr`;
+        document.getElementById("current-bid").innerText = `₹${currentBid.toFixed(2)} Cr`;
+        document.getElementById("bid-button").style.display = "block";
+    }
     function placeBid() {
         if (isKavyaOut) return;
-        if (currentBid < players[currentIndex].maxBid) {
+        let player = players[currentIndex];
+        if (currentBid < player.maxBid) {
             currentBid += 0.50;
-            document.getElementById("kavya-speech").innerText = "SRH is bidding!";
-            document.getElementById("current-bid").innerText = "₹" + currentBid.toFixed(2) + " Cr";
+            document.getElementById("kavya-speech").innerText = "SRH is bidding! We are raising the stake!";
+            updateUI();
         } else {
             isKavyaOut = true;
-            document.getElementById("kavya-speech").innerText = "₹" + currentBid.toFixed(2) + " Cr?! Too expensive. We are out!";
-            document.getElementById("kavya-img").src = kavyaSadImage; // यहाँ असली रियलिस्टिक फोटो लोड होगी
+            document.getElementById("kavya-speech").innerText = "₹" + currentBid.toFixed(2) + " Cr?! Too expensive. We are out! Press 'Pass' to continue.";
+            document.getElementById("kavya-img").src = kavyaSadImage; // यहाँ आपकी असली फोटो लोड होगी
             document.getElementById("bid-button").style.display = "none";
         }
     }
     function passPlayer() {
-        currentIndex++; isKavyaOut = false; currentBid = 2.0;
-        document.getElementById("kavya-img").src = "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='220' height='180' viewBox='0 0 220 180'><rect width='220' height='180' fill='%23111e30'/><text x='90' y='105' font-size='45'>🧑‍💼</text></svg>";
-        document.getElementById("player-name").innerText = players[currentIndex].name;
-        document.getElementById("current-bid").innerText = "₹2.00 Cr";
-        document.getElementById("bid-button").style.display = "block";
+        if (isKavyaOut) {
+            document.getElementById("kavya-speech").innerText = "You won the player! Loading next bidder...";
+        } else {
+            document.getElementById("kavya-speech").innerText = "Solid buy for SRH! Welcome to the Orange Army! 🧡";
+        }
+        setTimeout(() => {
+            currentIndex++; isKavyaOut = false;
+            if (currentIndex < players.length) {
+                currentBid = players[currentIndex].basePrice;
+                document.getElementById("kavya-speech").innerText = "Next player is up! Let's see who wins this one.";
+                document.getElementById("kavya-img").src = "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='220' height='180' viewBox='0 0 220 180'><rect width='220' height='180' fill='%23111e30'/><text x='90' y='105' font-size='45'>🧑‍💼</text></svg>";
+                updateUI();
+            } else {
+                document.getElementById("kavya-speech").innerText = "Auction Completed! Thank you for playing.";
+                alert("IPL 2027 Mega Auction Finished!");
+            }
+        }, 3000);
     }
+    window.onload = function() { updateUI(); };
     </script>
 </body>
 </html>
