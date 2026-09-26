@@ -1,3 +1,14 @@
+n Kishan", basePrice: 2.0, maxBid: 10.5 },
+        { name: "Abhishek Sharma", basePrice: 1.5, maxBid: 11.5 }
+    ];
+
+    let currentIndex = 0;
+    let currentBid = 2.0;
+    let isKavyaOut = false;
+    
+    // काव्या की असली फोटो का परमानेंट लाइव इंटरनेट लिंक जो दोनों जगह (Acode और वेबसाइट) काम करेगा
+    const kavyaSadImage = "https://ibb.co"; 
+
     function updateUI() {
         const player = players[currentIndex];
         document.getElementById("player-name").innerText = player.name;
@@ -47,4 +58,5 @@
     window.onload = function() { updateUI(); };
     </script>
 </body>
-</html>
+            </html>
+                
